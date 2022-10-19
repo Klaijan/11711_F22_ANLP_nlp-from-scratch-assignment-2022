@@ -1,3 +1,9 @@
+# Large files
+/scraped_pdfs
+
+# other files
+scrape.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

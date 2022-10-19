@@ -1,0 +1,448 @@
+Proceedings of the 1st Conference of the Asia-Paciﬁc Chapter of the Association for Computational Linguistics
+and the 10th International Joint Conference on Natural Language Processing: System Demonstrations , pages 14–19
+December 4 - 7, 2020. c2020 Association for Computational Linguistics14ISA: An Intelligent Shopping Assistant
+Tuan Manh Lai1,2, Trung Bui2, Nedim Lipka2
+1University of Illinois at Urbana-Champaign
+2Adobe Research
+Abstract
+Despite the growth of e-commerce, brick-and-
+mortar stores are still the preferred destina-
+tions for many people. In this paper, we
+present ISA, a mobile-based intelligent shop-
+ping assistant that is designed to improve shop-
+ping experience in physical stores. ISA assists
+users by leveraging advanced techniques in
+computer vision, speech processing, and natu-
+ral language processing. An in-store user only
+needs to take a picture or scan the barcode of
+the product of interest, and then the user can
+talk to the assistant about the product. The
+assistant can also guide the user through the
+purchase process or recommend other similar
+products to the user. We take a data-driven
+approach in building the engines of ISA’s nat-
+ural language processing component, and the
+engines achieve good performance.
+1 Introduction
+Shopping in physical stores is a popular option
+for many people. Each week, a lot of people en-
+ter supermarkets in which they are immersed with
+many different product choices. In many shopping
+centers, customer service representatives (CSRs)
+are employed to answer questions from customers
+about products. However, a customer may experi-
+ence long waiting time for assistance if all CSRs
+are busy interacting with other customers. There-
+fore, automated solutions can increase customer
+satisfaction and retention.
+In this paper, we introduce a mobile-based in-
+telligent shopping assistant, ISA, which is based
+on advanced techniques in computer vision, speech
+processing, and natural language processing. A
+user just needs to take a picture or scan the bar-
+code of the product of interest. After that, the user
+can ask ISA a variety of questions such as product
+1The work was conducted while the ﬁrst author interned
+at Adobe Research.
+Figure 1: ISA assists users at physical stores
+features, speciﬁcations and return policies. The as-
+sistant can also guide the user through the purchase
+process or recommend other similar products. This
+work can be used as the ﬁrst step in fully automat-
+ing customer service in shopping centers. With
+ISA, no CSRs will be needed as customers can
+simply turn to their phones for assistance. We have
+developed a fully functional prototype of ISA.
+The rest of the paper is organized as follows.
+Section 2 introduces some related work. Section 3
+gives an overview of the design and implementa-
+tion of the system. Finally, Section 4 concludes the
+paper and suggests future directions.
+2 Related Work
+The most closely related branches of work to
+ours are probably customer service chatbots for
+e-commerce websites. For example, SuperAgent
+(Cui et al., 2017) is a powerful chatbot that lever-
+ages large-scale and publicly available e-commerce
+data. The researchers demonstrate SuperAgent as
+an add-on extension to mainstream web browsers.
+When a user visits a product page, SuperAgent
+crawls the information of the product from multi-15
+Figure 2: The system overview of ISA
+ple data sources within the page. After that, the
+user can ask SuperAgent about the product. Un-
+like SuperAgent, ISA is designed to assist users at
+physical stores (Figure 1). In addition to natural
+language processing techniques, ISA also needs
+to use techniques in computer vision and speech
+processing when interacting with the users.
+3 System Description
+3.1 Overview
+When an in-store user wants to get more informa-
+tion about a speciﬁc product, the user just needs to
+take a picture or scan the barcode of the product.
+The system then retrieves the information of the
+product of interest from a database by using com-
+puter vision techniques. After that, the user can ask
+natural language questions about the product spec-
+iﬁcations to the system. The user can either type
+in the questions or directly speak out the questions
+using voice. ISA is integrated with both speech
+recognition and speech synthesis abilities, which
+allows users to ask questions without typing.
+Figure 2 shows the system overview of ISA. As
+the ﬁgure shows, a mobile client communicates
+with the backend through a well-deﬁned HTTP
+REST API. This creates a separation between the
+client and the server, which allows ISA to be scaled
+without much difﬁculty. The backend consists of
+three main components: 1) speech processing, 2)
+computer vision, 3) natural language processing.
+Users can chat with ISA in speech. The speech
+recognition and speech synthesis are implemented
+by calling third-party services. The computer vi-
+sion component is responsible for recognizing the
+products that the user is facing. Given an imageIntent Types Example Query
+Product Speciﬁcation QA How heavy is this chair?
+Recommendation Show me some other items
+Purchase I want to buy this.
+Chit Chat How are you doing?
+Table 1: Intent Types
+of a product of interest, a ﬁne-grained visual ob-
+ject classiﬁcation model will be used to identify
+the product and retrieve its information. This task
+is challenging because many products are visually
+very similar (e.g., washers and dryers usually have
+similar shape). Therefore, we enhance the com-
+ponent with highly accurate standard algorithms
+for barcode recognition. In case it is difﬁcult for
+the object classiﬁcation model to identify the prod-
+uct of interest accurately, the user can simply scan
+the barcode of the product. Finally, the natural
+language processing component is responsible for
+generating a response from a text query or ques-
+tion. We will next detail each part of the natural
+language processing component in the following
+sections.
+3.2 Intent Recognition
+When ISA receives a query from a user, the in-
+tent recognition engine is used to determine the
+intent of the query. Based on the recognized in-
+tent, the appropriate domain-speciﬁc engine will
+be triggered. We deﬁne four different types of in-
+tent as shown in Table 1. Intent detection can be
+naturally treated as a classiﬁcation problem. In this
+work we build a random forest model (Breiman,
+2001) for the problem and it achieves good per-
+formance. Other popular classiﬁers like support
+vector machines (Haffner et al., 2003) and deep16
+Figure 3: Answering questions regarding product spec-
+iﬁcations
+neural network methods (Sarikaya et al., 2011) can
+also be applied in this case.
+We create a dataset of 500 different queries and
+use it to build a random forest (RF) for intent classi-
+ﬁcation. Approximately 2/3 of the cases are used as
+training set, whereas the rest (1/3) are used as test
+set, in order to estimate the model’s performance.
+We create a bag-of-words feature vector for each
+query and use it as input for the RF. The number
+of trees in the forest is set to be 80. For each node
+split during the growing of a tree, the number of
+features used to determine the best split is set to
+bep
+kwhere kis the total number of features of
+the dataset. The accuracy of the trained RF model
+evaluated on the test set is 98.20%.
+3.3 Product Speciﬁcation QA
+The product speciﬁcation QA engine is used to
+answer questions regarding the speciﬁcations of a
+product. For every product, there is a list of speciﬁ-
+cations in the form of (speciﬁcation name, speciﬁ-
+cation value). We formalize the task of the engine
+as follows: Given a question Qabout a product P
+and the list of speciﬁcations (s1; s2; :::; s M)ofP,
+the goal is to identify the speciﬁcation that is most
+relevant to the question Q.Mis the number of
+speciﬁcations of the product, and siis the sequence
+of words in the name of the ithspeciﬁcation. In
+this formulation, the task is similar to the answer
+selection problem. ‘Answers’ shall be individual
+Figure 4: ISA recommends similar products to the user
+product speciﬁcations.
+Previous methods for answer selection typically
+relies on feature engineering, linguistic tools, or
+external resources (Wang and Manning, 2010; Heil-
+man and Smith, 2010; Yih et al., 2013; Yao et al.,
+2013). Recently, with the renaissance of neural
+network models, many deep learning based meth-
+ods have been proposed to tackle the answer se-
+lection problem (Rao et al., 2016; Zhiguo Wang,
+2017; Bian et al., 2017; Shen et al., 2017; Tran
+et al., 2018; Lai et al., 2018a; Tay et al., 2018;
+Lai et al., 2018b,c; Rao et al., 2019; Lai et al.,
+2019; Garg et al., 2019; Kamath et al., 2019; Laskar
+et al., 2020). These deep learning based methods
+typically outperform traditional techniques with-
+out relying on any feature engineering or expen-
+sive external resources. For example, the IWAN
+model proposed in (Shen et al., 2017) achieves
+competitive performance on public datasets such
+as TrecQA (Wang et al., 2007) and WikiQA (Yang
+et al., 2015).
+Using Amazon Mechanical Turk, a popular
+crowdsourcing platform, we create a dataset of
+6,922 questions that are related to 369 speciﬁca-
+tions and 148 products listed in the Home Depot
+website. We implement the IWAN model and train
+the model on the collected dataset. The top-1 ac-
+curacy, top-2 accuracy, and top-3 accuracy of the
+model evaluated on a held-out test set are 85.60%,
+95.80%, and 97.60%, respectively.17
+Figure 5: The user purchased an ofﬁce chair with 5%
+discount
+In production, given a question about a product,
+the trained model is used to rank every speciﬁcation
+of the product based on how relevant the speciﬁca-
+tion is. We select the top-ranked speciﬁcation and
+use it to generate the response sentence using pre-
+deﬁned templates (Cui et al., 2017). An example
+of the product speciﬁcation QA engine’s outputs
+is shown in Figure 3. The ﬁrst question from the
+user is matched to the product weight speciﬁca-
+tion, whereas the second question is matched to the
+return policy speciﬁcation.
+3.4 Recommendation
+The recommendation engine is responsible for giv-
+ing new suggestions and recommendations to users.
+When a user wants to look for similar products (e.g.,
+by saying “Are there any other similar products?”),
+the engine will search the database for related prod-
+ucts and then send the information of them to the
+app for displaying to the user (Figure 4).
+3.5 Purchase
+The purchase engine is responsible for guiding the
+user through the purchase process. When a user
+wants to buy a speciﬁc product (e.g., by saying “I
+would like to purchase this product.”), the engine
+will ﬁrst query the database for information such as
+the product listing price, available discounts, and
+user payment information. After that, the engine
+will craft a special response message and send it
+to the client app in the user’s mobile device. The
+response message will instruct the app how to assistthe user through the purchase process or provide
+personalized discounts if applicable (Figure 5).
+3.6 Chit Chat
+The chit chat engine is used to reply to greeting
+queries such as “How are you doing?” or queries
+that are off the subject such as “Is the sky blue?”.
+Our approach to building the engine is based on
+the sequence-to-sequence (seq2seq) framework
+(Sutskever et al., 2014). The model consists of
+two recurrent neural networks: an encoder and a
+decoder. The encoder converts the input query into
+a ﬁxed size feature vector. Based on that feature
+vector, the decoder generates the output response,
+one word at a time. The model is integrated with
+the global attention mechanism (Luong et al.,
+2015) so that the decoder can attend to speciﬁc
+parts of the input query when decoding instead of
+relying only on the ﬁxed size feature vector. We
+collect about 3M query-response pairs from Reddit
+and use them to train the seq2seq model. Examples
+of the engine’s outputs are shown below:
+Q: How are you doing?
+A: I’m doing well.
+Q: Is the sky blue?
+A: Yes.
+4 Conclusion and Future Work
+In this paper, we present ISA, a powerful intelli-
+gent shopping assistant. ISA is designed to achieve
+the goal of improving shopping experience in phys-
+ical stores by leveraging advanced techniques in
+computer vision, speech processing, and natural
+language processing. A user only needs to take a
+picture or scan the barcode of the product of in-
+terest, and then the user can ask ISA a variety of
+questions about the product. The system can also
+guide the user through the purchase decision or
+recommend other similar products to the user.
+There are many fronts on which we will be ex-
+ploring in the future. Currently the product speciﬁ-
+cation QA engine answers only questions regarding
+the speciﬁcations of a product. We will implement
+engines for addressing other kinds of questions.
+We will also extend ISA to better support other
+languages and informal text (Nguyen and Nguyen,
+2020; Nguyen et al., 2020; Martin et al., 2020). In
+addition, we will conduct a user study to evaluate
+our system in the future. Finally, we wish to extend
+this work to other domains such as building an as-18sistant for handling image editing requests (Brixey
+et al., 2018).
+5 Acknowledgments
+The authors wish to thank Dr. Hung Bui (VinAI
+Research) and Dr. Sheng Li (University of Georgia)
+for their guidance and feedback on this project.
+References
+Weijie Bian, Si Li, Zhao Yang, Guang Chen, and
+Zhiqing Lin. 2017. A compare-aggregate model
+with dynamic-clip attention for answer selection. In
+Proceedings of the 2017 ACM on Conference on
+Information and Knowledge Management, CIKM
+2017, Singapore, November 06 - 10, 2017 , pages
+1987–1990.
+Leo Breiman. 2001. Random forests. Mach. Learn. ,
+45(1):5–32.
+Jacqueline Brixey, Ramesh Manuvinakurike, Nham
+Le, Tuan Lai, Walter Chang, and Trung Bui.
+2018. A system for automated image editing
+from natural language commands. arXiv preprint
+arXiv:1812.01083 .
+Lei Cui, Furu Wei, Shaohan Huang, Chuanqi Tan,
+Chaoqun Duan, and Ming Zhou. 2017. Superagent:
+A customer service chatbot for e-commerce web-
+sites. In Proceedings of ACL 2017, System Demon-
+strations , pages 97–102. Association for Computa-
+tional Linguistics.
+Siddhant Garg, Thuy Vu, and Alessandro Moschitti.
+2019. Tanda: Transfer and adapt pre-trained trans-
+former models for answer sentence selection. arXiv
+preprint arXiv:1911.04118 .
+P. Haffner, G. Tur, and J. H. Wright. 2003. Optimizing
+svms for complex call classiﬁcation. In Acoustics,
+Speech, and Signal Processing, 2003. Proceedings.
+(ICASSP ’03). 2003 IEEE International Conference
+on, volume 1, pages I–632–I–635 vol.1.
+Michael Heilman and Noah A. Smith. 2010. Tree edit
+models for recognizing textual entailments, para-
+phrases, and answers to questions. In Human
+Language Technologies: The 2010 Annual Confer-
+ence of the North American Chapter of the Associa-
+tion for Computational Linguistics , HLT ’10, pages
+1011–1019, Stroudsburg, PA, USA. Association for
+Computational Linguistics.
+Sanjay Kamath, B. Grau, and Y . Ma. 2019. Predicting
+and integrating expected answer types into a simple
+recurrent neural network model for answer sentence
+selection. Computaci ´on y Sistemas , 23.
+Tuan Lai, Trung Bui, Sheng Li, and Nedim Lipka.
+2018a. A simple end-to-end question answering
+model for product information. In Proceedings ofthe First Workshop on Economics and Natural Lan-
+guage Processing , pages 38–43, Melbourne, Aus-
+tralia. Association for Computational Linguistics.
+Tuan Lai, Trung Bui, Nedim Lipka, and Sheng Li.
+2018b. Supervised transfer learning for product in-
+formation question answering. In 2018 17th IEEE
+International Conference on Machine Learning and
+Applications (ICMLA) , pages 1109–1114. IEEE.
+Tuan Lai, Quan Hung Tran, Trung Bui, and Daisuke
+Kihara. 2019. A gated self-attention memory net-
+work for answer selection. In Proceedings of the
+2019 Conference on Empirical Methods in Natu-
+ral Language Processing and the 9th International
+Joint Conference on Natural Language Processing
+(EMNLP-IJCNLP) , pages 5953–5959, Hong Kong,
+China. Association for Computational Linguistics.
+Tuan Manh Lai, Trung Bui, and Sheng Li. 2018c. A
+review on deep learning techniques applied to an-
+swer selection. In Proceedings of the 27th Inter-
+national Conference on Computational Linguistics ,
+pages 2132–2144, Santa Fe, New Mexico, USA. As-
+sociation for Computational Linguistics.
+Md Tahmid Rahman Laskar, Jimmy Xiangji Huang,
+and Enamul Hoque. 2020. Contextualized embed-
+dings based transformer encoder for sentence sim-
+ilarity modeling in answer selection task. In Pro-
+ceedings of The 12th Language Resources and Eval-
+uation Conference , pages 5505–5514, Marseille,
+France. European Language Resources Association.
+Minh-Thang Luong, Hieu Pham, and Christo-
+pher D. Manning. 2015. Effective approaches to
+attention-based neural machine translation. CoRR ,
+abs/1508.04025.
+Louis Martin, Benjamin Muller, Pedro Javier Or-
+tiz Su ´arez, Yoann Dupont, Laurent Romary, ´Eric
+de la Clergerie, Djam ´e Seddah, and Beno ˆıt Sagot.
+2020. CamemBERT: a tasty French language model.
+InProceedings of the 58th Annual Meeting of the
+Association for Computational Linguistics , pages
+7203–7219, Online. Association for Computational
+Linguistics.
+Dat Quoc Nguyen and Anh Tuan Nguyen. 2020.
+PhoBERT: Pre-trained language models for Viet-
+namese. Findings of EMNLP .
+Dat Quoc Nguyen, Thanh Vu, and Anh Tuan Nguyen.
+2020. BERTweet: A pre-trained language model for
+English Tweets. In Proceedings of the 2020 Con-
+ference on Empirical Methods in Natural Language
+Processing: System Demonstrations .
+Jinfeng Rao, Hua He, and Jimmy Lin. 2016. Noise-
+contrastive estimation for answer selection with
+deep neural networks. In Proceedings of the 25th
+ACM International on Conference on Information
+and Knowledge Management , pages 1913–1916.
+ACM.19Jinfeng Rao, Linqing Liu, Yi Tay, Wei Yang, Peng
+Shi, and Jimmy Lin. 2019. Bridging the gap be-
+tween relevance matching and semantic matching
+for short text similarity modeling. In Proceedings of
+the 2019 Conference on Empirical Methods in Nat-
+ural Language Processing and the 9th International
+Joint Conference on Natural Language Processing
+(EMNLP-IJCNLP) , pages 5370–5381, Hong Kong,
+China. Association for Computational Linguistics.
+R. Sarikaya, G. E. Hinton, and B. Ramabhadran. 2011.
+Deep belief nets for natural language call-routing.
+In2011 IEEE International Conference on Acous-
+tics, Speech and Signal Processing (ICASSP) , pages
+5680–5683.
+Gehui Shen, Yunlun Yang, and Zhi-Hong Deng. 2017.
+Inter-weighted alignment network for sentence pair
+modeling. In Proceedings of the 2017 Conference
+on Empirical Methods in Natural Language Process-
+ing, pages 1190–1200.
+Ilya Sutskever, Oriol Vinyals, and Quoc V . Le. 2014.
+Sequence to sequence learning with neural networks.
+InNIPS .
+Yi Tay, Luu Anh Tuan, and Siu Cheung Hui. 2018.
+Multi-cast attention networks. In KDD .
+Quan Hung Tran, Tuan Lai, Gholamreza Haffari, Ingrid
+Zukerman, Trung Bui, and Hung Bui. 2018. The
+context-dependent additive recurrent neural net. In
+Proceedings of the 2018 Conference of the North
+American Chapter of the Association for Computa-
+tional Linguistics: Human Language Technologies,
+Volume 1 (Long Papers) , pages 1274–1283, New
+Orleans, Louisiana. Association for Computational
+Linguistics.Mengqiu Wang and Christopher D. Manning. 2010.
+Probabilistic tree-edit models with structured latent
+variables for textual entailment and question answer-
+ing. In Proceedings of the 23rd International Con-
+ference on Computational Linguistics , COLING ’10,
+pages 1164–1172, Stroudsburg, PA, USA. Associa-
+tion for Computational Linguistics.
+Mengqiu Wang, Noah A. Smith, and Teruko Mita-
+mura. 2007. What is the jeopardy model? a quasi-
+synchronous grammar for qa. In EMNLP-CoNLL .
+Yi Yang, Wen-tau Yih, and Christopher Meek. 2015.
+WikiQA: A challenge dataset for open-domain ques-
+tion answering. In Proceedings of the 2015 Con-
+ference on Empirical Methods in Natural Language
+Processing , pages 2013–2018, Lisbon, Portugal. As-
+sociation for Computational Linguistics.
+Xuchen Yao, Benjamin Van Durme, Chris Callison-
+burch, and Peter Clark. 2013. Answer extraction as
+sequence tagging with tree edit distance. In North
+American Chapter of the Association for Computa-
+tional Linguistics (NAACL) .
+Wen-tau Yih, Ming-Wei Chang, Christopher Meek, and
+Andrzej Pastusiak. 2013. Question answering using
+enhanced lexical semantic models. In Proceedings
+of the 51st Annual Meeting of the Association for
+Computational Linguistics (Volume 1: Long Papers) ,
+pages 1744–1753, Soﬁa, Bulgaria. Association for
+Computational Linguistics.
+Radu Florian Zhiguo Wang, Wael Hamza. 2017. Bilat-
+eral multi-perspective matching for natural language
+sentences. In Proceedings of the Twenty-Sixth Inter-
+national Joint Conference on Artiﬁcial Intelligence,
+IJCAI-17 , pages 4144–4150.
